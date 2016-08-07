@@ -184,9 +184,15 @@ if [[ ! -f "/Library/Developer/CommandLineTools/usr/bin/clang" ]]; then
 fi
 
 # Install Ansible
-if ! exists pip; then
-    setStatusMessage "Install PIP"
-    sudo easy_install --quiet pip
+if ! exists brew; then
+	setStatusMessage "Install Homebrew"
+	yes | /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" &> /dev/null
+fi
+if ! exists python || ! exists pip; then
+	# brew python (pip is included) if either python or pip isn't installed
+	# TODO: probably should check for existing brewed python if only pip isn't installed
+    setStatusMessage "Install Python and PIP"
+	pip install python
 fi
 if ! exists ansible; then
     setStatusMessage "Install Ansible"
