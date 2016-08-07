@@ -192,7 +192,7 @@ if ! exists python || ! exists pip; then
 	# brew python (pip is included) if either python or pip isn't installed
 	# TODO: probably should check for existing brewed python if only pip isn't installed
     setStatusMessage "Install Python and PIP"
-	pip install python
+	brew install python
 fi
 if ! exists ansible; then
     setStatusMessage "Install Ansible"
