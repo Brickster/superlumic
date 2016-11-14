@@ -84,7 +84,7 @@ function error
 
 function print_usage
 {
-    echo "usage: superlumic [-h] [-v] [-a | -f FILE] [-u USER]"
+    echo "usage: superlumic [-h] [-v] [-a | -f FILE] [-u USER] [-r REPOSITORY]"
 }
 
 function show_help
@@ -101,6 +101,8 @@ function show_help
     echo "  -a, --ask-vault-pass  ask for vault password"
     echo "  -f, --vault-password-file"
     echo "                        vault password file or script"
+    echo "  -r, --repository REPOSITORY"
+    echo "                        repository to use (default: https://github.com/superlumic/superlumic-config.git)"
     echo
     echo "for more detail, use: man superlumic"
     exit 0
