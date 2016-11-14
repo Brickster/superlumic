@@ -163,7 +163,7 @@ if $ask_vault_pass && [[ ! -z "$vault_password_file" ]]; then
     error "options -a|--ask-vault-pass and -f|--vault-password-file FILE are mutually exclusive"
 fi
 
-export HOMEBREW_CASK_OPTS="--appdir=/Applications"
+export HOMEBREW_CASK_OPTS="--appdir=~/Applications"
 
 printf "${BGreen}   _________                         .__                .__        ${Color_Off}\n"
 printf "${BGreen}  /   _____/__ ________   ___________|  |  __ __  _____ |__| ____  ${Color_Off}\n"
