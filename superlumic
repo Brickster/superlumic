@@ -193,10 +193,10 @@ if ! exists brew; then
 	yes | /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" &> /dev/null
 fi
 if ! exists python || ! exists pip; then
-	# brew python (pip is included) if either python or pip isn't installed
-	# TODO: probably should check for existing brewed python if only pip isn't installed
+    # brew python (pip is included) if either python or pip isn't installed
+    # TODO: probably should check for existing brewed python if only pip isn't installed
     setStatusMessage "Install Python and PIP"
-	brew install python
+    brew install python@2
 fi
 if ! exists ansible; then
     setStatusMessage "Install Ansible"
