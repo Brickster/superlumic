@@ -166,12 +166,13 @@ fi
 # TODO: temporarily added --no-quarantine as a workaround to homebrew/brew#4852
 export HOMEBREW_CASK_OPTS="--no-quarantine --appdir=~/Applications"
 
-printf "${BGreen}   _________                         .__                .__        ${Color_Off}\n"
-printf "${BGreen}  /   _____/__ ________   ___________|  |  __ __  _____ |__| ____  ${Color_Off}\n"
-printf "${BGreen}  \_____  \|  |  \____ \_/ __ \_  __ \  | |  |  \/     \|  |/ ___\ ${Color_Off}\n"
-printf "${BGreen}  /        \  |  /  |_> >  ___/|  | \/  |_|  |  /  Y Y  \  \  \___ ${Color_Off}\n"
-printf "${BGreen} /_______  /____/|   __/ \___  >__|  |____/____/|__|_|  /__|\___  >${Color_Off}\n"
-printf "${BGreen}         \/      |__|        \/ http://superlumic.com \/        \/ ${Color_Off}\n\n"
+# Banner generated at http://patorjk.com/software/taag/#p=display&f=Slant&t=superlumic
+printf "${BGreen}                               __                _     ${Color_Off}\n"
+printf "${BGreen}   _______  ______  ___  _____/ /_  ______ ___  (_)____${Color_Off}\n"
+printf "${BGreen}  / ___/ / / / __ \/ _ \/ ___/ / / / / __ `__ \/ / ___/${Color_Off}\n"
+printf "${BGreen} (__  ) /_/ / /_/ /  __/ /  / / /_/ / / / / / / / /__  ${Color_Off}\n"
+printf "${BGreen}/____/\__,_/ .___/\___/_/  /_/\__,_/_/ /_/ /_/_/\___/  ${Color_Off}\n"
+printf "${BGreen}          /_/ http://superlumic.com                    ${Color_Off}\n\n"
 
 setStatusMessage "Checking if we need to ask for a sudo password"
 sudo -v
