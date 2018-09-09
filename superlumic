@@ -68,7 +68,7 @@ function error
 
 function print_usage
 {
-    echo "usage: superlumic [-h] [-v] [-a | -f FILE] [-u USER] [-r REPOSITORY]"
+    echo "usage: superlumic [-h] [-v] [-a | -f FILE] [-u USER] [-r REPOSITORY] [-B] [-U]"
 }
 
 function show_help
@@ -87,6 +87,9 @@ function show_help
     echo "                        vault password file or script"
     echo "  -r, --repository REPOSITORY"
     echo "                        repository to use (required: on first use only)"
+    echo "  -B, --no-ask-become-pass"
+    echo "                        do not start ansible with --ask-become-pass"
+    echo "  -U, --no-update       do not update config or requirements but pull them if they don't exist"
     echo
     echo "for more detail, use: man superlumic"
     exit 0
@@ -96,8 +99,10 @@ function show_help
 username="$(whoami)"
 repo=https://github.com/Brickstertwo/superlumic-config
 ask_vault_pass=false
+ask_become_pass=true
 vault_password_file=
-while getopts ":hvu:r:af:-:" opt; do
+update_dependencies=true
+while getopts ":hvu:r:aBUf:-:" opt; do
     case $opt in
         -)
             case "${OPTARG}" in
@@ -118,6 +123,12 @@ while getopts ":hvu:r:af:-:" opt; do
                 ask-vault-pass)
                     ask_vault_pass=true
                     ;;
+                no-ask-become-pass)
+                    ask_become_pass=false
+                    ;;
+                no-update)
+                    update_dependencies=false
+                    ;;
                 vault-password-file)
                     vault_password_file="${!OPTIND}"
                     OPTIND=$(( $OPTIND + 1 ))
@@ -133,6 +144,8 @@ while getopts ":hvu:r:af:-:" opt; do
         u)  username="$OPTARG";;
         r)  repo="$OPTARG";;
         a)  ask_vault_pass=true;;
+        B)  ask_become_pass=false;;
+        U)  update_dependencies=false;;
         f)  vault_password_file="$OPTARG";;
         h)  show_help;;
         v)  show_version;;
@@ -181,17 +194,19 @@ if ! exists ansible; then
     pip install -q ansible
 fi
 
-setStatusMessage "Create necessary folders"
 if [[ ! -d "/usr/local/superlumic" ]]; then
+  setStatusMessage "Create necessary folders"
   sudo mkdir -p /usr/local/superlumic/roles
   sudo chmod -R g+rwx /usr/local/superlumic
   sudo chgrp -R admin /usr/local/superlumic
 fi
 
 if [ -d "/usr/local/superlumic/config" ]; then
+  if $update_dependencies; then
     setStatusMessage "Update your config from git"
     cd /usr/local/superlumic/config
     git pull -q
+  fi
 else
     if [ ! -z "$repo" ]; then
         setStatusMessage "Cloning config from git"
@@ -204,22 +219,27 @@ fi
 cd /usr/local/superlumic
 
 setStatusMessage "Create ansible.cfg"
-
 { echo '[defaults]'; echo 'roles_path=/usr/local/superlumic/roles:/usr/local/superlumic/config/roles'; } > ansible.cfg
 
 setStatusMessage "Get all the required roles"
+ansible_install_options=""
+if $update_dependencies; then
+  ansible_install_options="$ansible_install_options --force"
+fi
+ansible-galaxy install --role-file config/requirements.yml --roles-path roles $ansible_install_options
 
-ansible-galaxy install -f -r config/requirements.yml -p roles
-
+ansible_options=""
 if [ -f "config/$username.yml" ]; then
     setStatusMessage "Running the ansible playbook for $username"
     if $ask_vault_pass; then
-        ansible-playbook -i "localhost," config/$username.yml --ask-become-pass --ask-vault-pass
+      ansible_options="$ansible_options --ask-vault-pass"
     elif [[ ! -z "$vault_password_file" ]]; then
-        ansible-playbook -i "localhost," config/$username.yml --ask-become-pass --vault-password-file "$vault_password_file"
-    else
-        ansible-playbook -i "localhost," config/$username.yml --ask-become-pass 
+      ansible_options="$ansible_options --vault-password-file \"$vault_password_file\""
     fi
+    if $ask_become_pass; then
+      ansible_options="$ansible_options --ask-become-pass"
+    fi
+    ansible-playbook -i "localhost," config/$username.yml $ansible_options
 else
     triggerError "No playbook for $username found"
 fi
