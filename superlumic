@@ -174,13 +174,6 @@ printf "${BGreen} (__  ) /_/ / /_/ /  __/ /  / / /_/ / / / / / / / /__  ${Color_
 printf "${BGreen}/____/\__,_/ .___/\___/_/  /_/\__,_/_/ /_/ /_/_/\___/  ${Color_Off}\n"
 printf "${BGreen}          /_/ http://superlumic.com                    ${Color_Off}\n\n"
 
-setStatusMessage "Checking if we need to ask for a sudo password"
-sudo -v
-export ANSIBLE_ASK_SUDO_PASS=True
-setStatusMessage "Keep-alive: update existing sudo time stamp until we are finished"
-
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-
 # install CLT
 if [[ ! -f "/Library/Developer/CommandLineTools/usr/bin/clang" ]]; then
     setStatusMessage "Install the CLT"
@@ -205,10 +198,11 @@ if ! exists ansible; then
 fi
 
 setStatusMessage "Create necessary folders"
-sudo mkdir -p /usr/local/superlumic
-sudo mkdir -p /usr/local/superlumic/roles
-sudo chmod -R g+rwx /usr/local/superlumic
-sudo chgrp -R admin /usr/local/superlumic
+if [[ ! -d "/usr/local/superlumic" ]]; then
+  sudo mkdir -p /usr/local/superlumic/roles
+  sudo chmod -R g+rwx /usr/local/superlumic
+  sudo chgrp -R admin /usr/local/superlumic
+fi
 
 if [ -d "/usr/local/superlumic/config" ]; then
     setStatusMessage "Update your config from git"
@@ -237,11 +231,11 @@ ansible-galaxy install -f -r config/requirements.yml -p roles
 if [ -f "config/$username.yml" ]; then
     setStatusMessage "Running the ansible playbook for $username"
     if $ask_vault_pass; then
-        ansible-playbook -i "localhost," config/$username.yml --ask-vault-pass
+        ansible-playbook -i "localhost," config/$username.yml --ask-become-pass --ask-vault-pass
     elif [[ ! -z "$vault_password_file" ]]; then
-        ansible-playbook -i "localhost," config/$username.yml --vault-password-file "$vault_password_file"
+        ansible-playbook -i "localhost," config/$username.yml --ask-become-pass --vault-password-file "$vault_password_file"
     else
-        ansible-playbook -i "localhost," config/$username.yml
+        ansible-playbook -i "localhost," config/$username.yml --ask-become-pass 
     fi
 else
     if [ "travis" = "$username" ]; then
