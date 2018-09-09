@@ -86,7 +86,7 @@ function show_help
     echo "  -f, --vault-password-file"
     echo "                        vault password file or script"
     echo "  -r, --repository REPOSITORY"
-    echo "                        repository to use (default: https://github.com/superlumic/superlumic-config.git)"
+    echo "                        repository to use (required: on first use only)"
     echo
     echo "for more detail, use: man superlumic"
     exit 0
