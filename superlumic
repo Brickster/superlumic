@@ -210,11 +210,10 @@ if [ -d "/usr/local/superlumic/config" ]; then
     git pull -q
 else
     if [ ! -z "$repo" ]; then
-        setStatusMessage "Getting your config from your fork"
+        setStatusMessage "Cloning config from git"
         git clone -q "$repo" /usr/local/superlumic/config
     else
-        setStatusMessage "Getting the default config"
-        git clone -q https://github.com/superlumic/superlumic-config.git /usr/local/superlumic/config
+      triggerError 'No config exists. --repository=<<repository>> is required.'
     fi
 fi
 
